@@ -2,10 +2,13 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/varundey/oncall/internal/agent"
 )
 
 const defaultModel = "claude-sonnet-5-5"
@@ -15,6 +18,9 @@ func main() {
 	flag.Parse()
 
 	fmt.Fprintf(os.Stderr, "oncall (model: %s). Describe the problem, or type 'exit' to quit.\n", *model)
+
+	a := agent.New(*model)
+	ctx := context.Background()
 
 	in := bufio.NewScanner(os.Stdin)
 	for {
@@ -29,6 +35,11 @@ func main() {
 		case "exit", "quit":
 			return
 		}
-		fmt.Printf("(not wired up yet) you said: %s\n", line)
+		reply, err := a.Send(ctx, line)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+			continue
+		}
+		fmt.Println(reply)
 	}
 }
