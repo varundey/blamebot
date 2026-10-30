@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/varundey/oncall/internal/agent"
+	"github.com/varundey/oncall/internal/tools"
 )
 
 const defaultModel = "claude-sonnet-5-5"
@@ -19,7 +20,7 @@ func main() {
 
 	fmt.Fprintf(os.Stderr, "oncall (model: %s). Describe the problem, or type 'exit' to quit.\n", *model)
 
-	a := agent.New(*model)
+	a := agent.New(*model, tools.NewRegistry())
 	ctx := context.Background()
 
 	in := bufio.NewScanner(os.Stdin)
