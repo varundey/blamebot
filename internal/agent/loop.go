@@ -41,6 +41,7 @@ func (a *Agent) Send(ctx context.Context, text string) (string, error) {
 		resp, err := a.client.Messages.New(ctx, anthropic.MessageNewParams{
 			Model:     anthropic.Model(a.model),
 			MaxTokens: maxTokens,
+			System:    []anthropic.TextBlockParam{{Text: systemPrompt}},
 			Messages:  a.history,
 			Tools:     a.tools.Params(),
 		})
