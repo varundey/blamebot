@@ -4,3 +4,4 @@
 .env
 .DS_Store
 .idea/
+examples/login500/data/
