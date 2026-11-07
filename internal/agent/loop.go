@@ -4,6 +4,7 @@ package agent
 import (
 	"context"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/anthropics/anthropic-sdk-go"
@@ -25,6 +26,9 @@ type Agent struct {
 	model   string
 	tools   *tools.Registry
 	history []anthropic.MessageParam
+
+	// Trace, if set, receives a dimmed one-line note for each tool call.
+	Trace io.Writer
 }
 
 // New returns an Agent that reads ANTHROPIC_API_KEY from the environment.
@@ -68,11 +72,14 @@ func (a *Agent) Send(ctx context.Context, text string) (string, error) {
 			if !ok {
 				continue
 			}
+			a.trace("-> %s %s", use.Name, oneLine(string(use.Input), 160))
 			out, err := a.tools.Run(ctx, use.Name, use.Input)
 			if err != nil {
+				a.trace("   failed: %s", oneLine(err.Error(), 160))
 				results = append(results, anthropic.NewToolResultBlock(use.ID, err.Error(), true))
 				continue
 			}
+			a.trace("   %d bytes", len(out))
 			results = append(results, anthropic.NewToolResultBlock(use.ID, out, false))
 		}
 		a.history = append(a.history, anthropic.NewUserMessage(results...))
@@ -88,4 +95,19 @@ func replyText(m *anthropic.Message) string {
 		}
 	}
 	return sb.String()
+}
+
+func (a *Agent) trace(format string, args ...any) {
+	if a.Trace != nil {
+		fmt.Fprintf(a.Trace, "\x1b[2m"+format+"\x1b[0m\n", args...)
+	}
+}
+
+// oneLine collapses s onto a single line of at most max bytes.
+func oneLine(s string, max int) string {
+	s = strings.Join(strings.Fields(s), " ")
+	if len(s) > max {
+		return s[:max] + "..."
+	}
+	return s
 }

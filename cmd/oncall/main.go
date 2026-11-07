@@ -37,6 +37,7 @@ func main() {
 		}},
 	)
 	a := agent.New(*model, reg)
+	a.Trace = os.Stderr
 	ctx := context.Background()
 
 	fmt.Fprintf(os.Stderr, "oncall (model: %s). Describe the problem, or type 'exit' to quit.\n", *model)
