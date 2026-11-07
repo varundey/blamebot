@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/anthropics/anthropic-sdk-go"
+	"github.com/anthropics/anthropic-sdk-go/option"
 
 	"github.com/varundey/oncall/internal/tools"
 )
@@ -31,9 +32,10 @@ type Agent struct {
 	Trace io.Writer
 }
 
-// New returns an Agent that reads ANTHROPIC_API_KEY from the environment.
-func New(model string, reg *tools.Registry) *Agent {
-	return &Agent{client: anthropic.NewClient(), model: model, tools: reg}
+// New returns an Agent. Unless opts say otherwise, the client reads
+// ANTHROPIC_API_KEY from the environment.
+func New(model string, reg *tools.Registry, opts ...option.RequestOption) *Agent {
+	return &Agent{client: anthropic.NewClient(opts...), model: model, tools: reg}
 }
 
 // Send adds a user message to the conversation, runs any tools Claude asks
