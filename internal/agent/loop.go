@@ -41,6 +41,7 @@ func New(model string, reg *tools.Registry, opts ...option.RequestOption) *Agent
 // Send adds a user message to the conversation, runs any tools Claude asks
 // for, and returns Claude's final reply.
 func (a *Agent) Send(ctx context.Context, text string) (string, error) {
+	start := len(a.history)
 	a.history = append(a.history, anthropic.NewUserMessage(anthropic.NewTextBlock(text)))
 
 	for turn := 0; turn < maxTurns; turn++ {
@@ -60,6 +61,9 @@ func (a *Agent) Send(ctx context.Context, text string) (string, error) {
 		case anthropic.StopReasonToolUse:
 			// Fall through to run the requested tools below.
 		case anthropic.StopReasonRefusal:
+			// A refusal carries no content, and replaying an empty assistant
+			// turn would make every later request fail, so forget this exchange.
+			a.history = a.history[:start]
 			return "", fmt.Errorf("request declined (%s)", resp.StopDetails.Category)
 		case anthropic.StopReasonMaxTokens:
 			return replyText(resp) + "\n[response cut off at max_tokens]", nil

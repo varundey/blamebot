@@ -189,3 +189,24 @@ func TestSendReportsRefusalAndMaxTokens(t *testing.T) {
 		t.Fatalf("max_tokens reply = %q, %v", got, err)
 	}
 }
+
+func TestSendForgetsRefusedExchange(t *testing.T) {
+	api := &fakeAPI{replies: []string{
+		`{"id":"m","type":"message","role":"assistant","model":"fake","content":[],"stop_reason":"refusal",` +
+			`"stop_details":{"type":"refusal","category":"cyber","explanation":"no"},"stop_sequence":null,` +
+			`"usage":{"input_tokens":1,"output_tokens":1}}`,
+		message("end_turn", `[{"type":"text","text":"fine"}]`),
+	}}
+	a := newTestAgent(t, api)
+
+	if _, err := a.Send(context.Background(), "first"); err == nil {
+		t.Fatal("expected refusal error")
+	}
+	if _, err := a.Send(context.Background(), "second"); err != nil {
+		t.Fatal(err)
+	}
+	msgs := api.requests[1]["messages"].([]any)
+	if len(msgs) != 1 {
+		t.Fatalf("request after refusal carried %d messages, want only the new one", len(msgs))
+	}
+}
