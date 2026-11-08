@@ -21,6 +21,7 @@ func main() {
 	// One scanner serves both the prompt and the approval questions, so the
 	// two never fight over buffered stdin.
 	in := bufio.NewScanner(os.Stdin)
+	in.Buffer(make([]byte, 64*1024), 4*1024*1024) // allow pasted log excerpts
 
 	reg := tools.NewRegistry(
 		tools.TailLogs{},
@@ -59,5 +60,9 @@ func main() {
 			continue
 		}
 		fmt.Println(reply)
+	}
+	if err := in.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "reading input:", err)
+		os.Exit(1)
 	}
 }
