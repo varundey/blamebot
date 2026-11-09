@@ -1,4 +1,4 @@
-module github.com/varundey/oncall
+module github.com/varundey/blamebot
 
 go 1.26.0
 

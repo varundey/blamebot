@@ -1,4 +1,4 @@
-/oncall
+/blamebot
 /bin/
 *.log.tmp
 .env

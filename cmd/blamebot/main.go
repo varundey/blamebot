@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/varundey/oncall/internal/agent"
-	"github.com/varundey/oncall/internal/tools"
+	"github.com/varundey/blamebot/internal/agent"
+	"github.com/varundey/blamebot/internal/tools"
 )
 
 const defaultModel = "claude-sonnet-5-5"

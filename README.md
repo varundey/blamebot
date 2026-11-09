@@ -27,8 +27,8 @@ so when it truncates.
 Requires Go 1.24+ and an `ANTHROPIC_API_KEY`.
 
 ```sh
-go run ./cmd/oncall                    # default model: claude-sonnet-5-5
-go run ./cmd/oncall --model claude-opus-5-5
+go run ./cmd/blamebot                    # default model: claude-sonnet-5-5
+go run ./cmd/blamebot --model claude-opus-5-5
 ```
 
 Each tool call is echoed as a dimmed line on stderr, so you can see what the
@@ -43,7 +43,7 @@ cause is only visible in the logs and the database.
 
 ```sh
 go run ./examples/login500             # serves on 127.0.0.1:8080, data in examples/login500/data
-go run ./cmd/oncall
+go run ./cmd/blamebot
 page> /login on http://127.0.0.1:8080 is returning 500s. Logs and db are in examples/login500/data
 ```
 
@@ -54,7 +54,7 @@ failed `0007_add_sessions_region` migration, and confirms it in
 ## Layout
 
 ```
-cmd/oncall/           flags, REPL, approval prompt
+cmd/blamebot/           flags, REPL, approval prompt
 internal/agent/       conversation loop and system prompt
 internal/tools/       Tool interface, registry, one file per tool
 examples/login500/    the broken service
