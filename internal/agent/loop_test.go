@@ -149,7 +149,7 @@ func TestSendSendsSystemPromptAndSortedTools(t *testing.T) {
 	}
 	req := api.requests[0]
 	sys := req["system"].([]any)[0].(map[string]any)["text"].(string)
-	if !strings.Contains(sys, "oncall") {
+	if !strings.Contains(sys, "blamebot") {
 		t.Errorf("system prompt not sent: %q", sys)
 	}
 	if name := req["tools"].([]any)[0].(map[string]any)["name"]; name != "echo" {

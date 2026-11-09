@@ -1,4 +1,4 @@
-// Command login500 is a deliberately broken service for trying out oncall.
+// Command login500 is a deliberately broken service for trying out blamebot.
 //
 // It serves GET /login?user=NAME and GET /healthz. Version 2.4.1 of the code
 // stores a "region" with each session, but the migration that adds that

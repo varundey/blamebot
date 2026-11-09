@@ -41,9 +41,9 @@ func main() {
 	a.Trace = os.Stderr
 	ctx := context.Background()
 
-	fmt.Fprintf(os.Stderr, "oncall (model: %s). Describe the problem, or type 'exit' to quit.\n", *model)
+	fmt.Fprintf(os.Stderr, "blamebot (model: %s). Describe the problem, or type 'exit' to quit.\n", *model)
 	for {
-		fmt.Print("\x1b[1mpage>\x1b[0m ")
+		fmt.Print("\x1b[1mwhat broke?>\x1b[0m ")
 		if !in.Scan() {
 			break
 		}

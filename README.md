@@ -1,4 +1,4 @@
-# oncall
+# blamebot
 
 A small terminal agent that helps work out why a backend service is misbehaving.
 You describe the symptom; it reads logs, probes endpoints and queries the
@@ -6,7 +6,7 @@ database, then tells you what it found and what it would change. It
 investigates only: the tools it has cannot modify the system.
 
 ```
-page> the /login endpoint is returning 500s
+what broke?> the /login endpoint is returning 500s
 ```
 
 ## Tools
@@ -44,7 +44,7 @@ cause is only visible in the logs and the database.
 ```sh
 go run ./examples/login500             # serves on 127.0.0.1:8080, data in examples/login500/data
 go run ./cmd/blamebot
-page> /login on http://127.0.0.1:8080 is returning 500s. Logs and db are in examples/login500/data
+what broke?> /login on http://127.0.0.1:8080 is returning 500s. Logs and db are in examples/login500/data
 ```
 
 A good investigation probes the endpoint, greps the log for errors, finds the
