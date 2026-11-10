@@ -1,9 +1,9 @@
 # blamebot
 
-A small terminal agent that helps work out why a backend service is misbehaving.
+A small terminal agent that finds what broke your service and blames it, loudly.
 You describe the symptom; it reads logs, probes endpoints and queries the
-database, then tells you what it found and what it would change. It
-investigates only: the tools it has cannot modify the system.
+database, then names the culprit with the evidence and what it would change.
+It investigates only: the tools it has cannot modify the system.
 
 ```
 what broke?> the /login endpoint is returning 500s
@@ -32,7 +32,24 @@ go run ./cmd/blamebot --model claude-opus-5-5
 ```
 
 Each tool call is echoed as a dimmed line on stderr, so you can see what the
-agent is looking at as it goes.
+agent is looking at as it goes. While it investigates it stays quiet and
+precise; only the final verdict is loud. Pass `--no-color` (or set `NO_COLOR`)
+to turn the highlighting off.
+
+## The verdict
+
+Every answer ends in one of two shapes. When the evidence names a culprit:
+
+```
+BLAME: <the thing that broke it>
+<a blunt sentence or two on what it did>
+Evidence: <log lines, responses, rows, with paths and line numbers>
+Fix: <what a human should change>
+```
+
+When it can't prove a cause it says `NO ONE TO BLAME (YET)` and lists what it
+ruled out, rather than guessing. It blames things (a migration, a config key, a
+dependency), never people.
 
 ## Try it on a broken service
 
@@ -49,12 +66,20 @@ what broke?> /login on http://127.0.0.1:8080 is returning 500s. Logs and db are 
 
 A good investigation probes the endpoint, greps the log for errors, finds the
 failed `0007_add_sessions_region` migration, and confirms it in
-`schema_migrations`. Delete `examples/login500/data` to reset the service.
+`schema_migrations`. The verdict should open along the lines of:
+
+```
+BLAME: migration 0007_add_sessions_region
+It failed with "database is locked" during the 2.4.1 deploy, and startup carried on anyway.
+```
+
+(That is the intended shape, not a recorded run.) Delete
+`examples/login500/data` to reset the service.
 
 ## Layout
 
 ```
-cmd/blamebot/           flags, REPL, approval prompt
+cmd/blamebot/         flags, REPL, approval prompt, verdict highlighting
 internal/agent/       conversation loop and system prompt
 internal/tools/       Tool interface, registry, one file per tool
 examples/login500/    the broken service
