@@ -16,6 +16,7 @@ const defaultModel = "claude-sonnet-5-5"
 
 func main() {
 	model := flag.String("model", defaultModel, "Claude model to use")
+	noColor := flag.Bool("no-color", os.Getenv("NO_COLOR") != "", "don't highlight the verdict (also set by NO_COLOR)")
 	flag.Parse()
 
 	// One scanner serves both the prompt and the approval questions, so the
@@ -58,6 +59,9 @@ func main() {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "error:", err)
 			continue
+		}
+		if !*noColor {
+			reply = highlightVerdict(reply)
 		}
 		fmt.Println(reply)
 	}
